@@ -19,7 +19,10 @@ class Main():
     
     def createstyles(self):
         titlestyle= ttk.Style()
-        titlestyle.configure('Title.TButton', font=('helvetica', 20), padding=0)
+        titlestyle.configure('Title.TLabel', font=('helvetica', 20), padding=0)
+
+        diagramtext = ttk.Style()
+        diagramtext.configure('Diagram.TLabel', font=('helvetica', 20), padding=0, background='gray75')
 
 
 #Window wrapper for tkinter canvas.
@@ -58,6 +61,14 @@ class BasePage(tk.Frame):
         y2 = y2*canvas_height
         coords = [x1,y1,x2,y2]
         return canvas.create_line(coords, fill='black', width=2)
+    
+    def text_coords(self, x1, y1, canvas):
+        canvas_width = canvas.winfo_width()
+        canvas_height = canvas.winfo_height()
+        coords = [x1*canvas_width, y1*canvas_height]
+        return coords
+    
+    
 
 
     title = "Default title"
@@ -69,7 +80,7 @@ class HomePage(BasePage):
     def __init__(self, window, main):
         super().__init__(window, main)
 
-        ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Homepage", style="Title.TButton", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+        ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Homepage", style="Title.TLabel", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
         ttk.Button(self.strictboxwidget(column=2, row=4, columnspan=2 ), text="Demand curve", command=lambda: main.showpage(DPage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
         ttk.Button(self.strictboxwidget(column=2, row=6, columnspan=2 ), text="Supply curve", command=lambda: main.showpage(SPage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
 
@@ -79,23 +90,48 @@ class DPage(BasePage):
     def __init__(self, window, main):
         super().__init__(window, main)
 
-        ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Demand curve generator", style="Title.TButton", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+        ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Demand curve generator", style="Title.TLabel", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
         ttk.Button(self.strictboxwidget(row=4, column=1, columnspan=2), text="HomePage", command=lambda: main.showpage(HomePage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
+        ttk.Label(self.strictboxwidget(row=13, column=12, columnspan=6), text="Quantity", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+        ttk.Label(self.strictboxwidget(row=5, column=4, columnspan=2), text="Price", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
 
+        #diagram area:
         diagram = tk.Canvas(self.strictboxwidget(row=5, column=6, columnspan=8, rowspan=8), width=100, height=100, background='gray75')
         diagram.place(relx=0, rely=0, relwidth=1, relheight=1)
         diagram.update()
         self.line_coords(0.1, 0.9, 0.9, 0.9, diagram)
         self.line_coords(0.1, 0.9, 0.1, 0.1, diagram)
-
+        D = self.line_coords(0.2, 0.8, 0.8, 0.2, diagram)
+        self.UptoD = self.line_coords(0.2, 0.9, 0.2, 0.8, diagram)
+        self.RighttoD = self.line_coords(0.1, 0.8, 0.2, 0.8, diagram)
         
+        #diagram.create_text(self.text_coords(0.5, 0.5, diagram), text="D", font=("helvetica", 16), fill="black")
+        quantityscale = ttk.Scale(self.strictboxwidget(row=13, column=7, columnspan=5), orient='horizontal', length = 100, from_=20, to=75, command=lambda q:self.updateequilibrium(q, diagram))
+        quantityscale.place(relx=0, rely=0, relwidth=1, relheight=1)
+        pricescale = ttk.Scale(self.strictboxwidget(row=6, column=5, rowspan=5), orient='vertical', length = 100, from_=20, to=80)
+        pricescale.place(relx=0, rely=0, relwidth=1, relheight=1)
+        
+
+        ttk.Label(self.strictboxwidget(row=6, column=12, columnspan=1), text="D", style="Diagram.TLabel", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+
+    def updateequilibrium(self, q, diagram):
+        q=int(round(float(q)))
+        #coords = [q/10, 0.8, q/10, q/10, 0.1, q/10]   coords list in the schema [upToDx1, UptoDy1, Equilibiumx1, Equilibiumy1, RighttoDx1, RightdoDy1]
+        diagram.delete(self.UptoD, self.RighttoD)
+        diagram.update_idletasks()
+        self.UptoD = self.line_coords(q/100, 0.9, q/100, (1-(q/100)), diagram)
+        self.RighttoD = self.line_coords(0.1, (1-(q/100)), (q/100), (1-(q/100)), diagram)
+        diagram.update()
+
+
+
     title = "Demand curve generator"
 
 class SPage(BasePage):
     def __init__(self, window, main):
         super().__init__(window, main)
 
-        ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Supply curve generator", style="Title.TButton", anchor="center").place(relx=0, rely=0, relwidth=1, relheight=1)
+        ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Supply curve generator", style="Title.TLabel", anchor="center").place(relx=0, rely=0, relwidth=1, relheight=1)
         ttk.Button(self.strictboxwidget(row=4, columnspan=2), text="HomePage", command=lambda: main.showpage(HomePage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
 
     title = "Supply curve generator"
