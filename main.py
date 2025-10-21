@@ -44,7 +44,6 @@ class BasePage(tk.Frame):
         for i in range(15):
             self.grid_rowconfigure(i, weight=1, uniform="grid")
             self.grid_columnconfigure(i, weight=1, uniform="grid")
-        #self.grid_propagate(False)
     
     def strictboxwidget(self, column=0, row=0, columnspan=1, rowspan=1):
         frame = tk.Frame(self)
@@ -92,8 +91,14 @@ class DPage(BasePage):
 
         ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Demand curve generator", style="Title.TLabel", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
         ttk.Button(self.strictboxwidget(row=4, column=1, columnspan=2), text="HomePage", command=lambda: main.showpage(HomePage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
+
         ttk.Label(self.strictboxwidget(row=13, column=12, columnspan=6), text="Quantity", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.currentquantity = ttk.Label(self.strictboxwidget(row=10, column=3, columnspan=2), text="Quantity is 20", anchor="center" )
+        self.currentquantity.place(relx=0, rely=0, relwidth=1, relheight=1)
+
         ttk.Label(self.strictboxwidget(row=5, column=4, columnspan=2), text="Price", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.currentprice = ttk.Label(self.strictboxwidget(row=10, column=1, columnspan=2), text="Price is 80", anchor="center" )
+        self.currentprice.place(relx=0, rely=0, relwidth=1, relheight=1)
 
         #diagram area:
         diagram = tk.Canvas(self.strictboxwidget(row=5, column=6, columnspan=8, rowspan=8), width=100, height=100, background='gray75')
@@ -105,23 +110,22 @@ class DPage(BasePage):
         self.UptoD = self.line_coords(0.2, 0.9, 0.2, 0.8, diagram)
         self.RighttoD = self.line_coords(0.1, 0.8, 0.2, 0.8, diagram)
         
+        
         #diagram.create_text(self.text_coords(0.5, 0.5, diagram), text="D", font=("helvetica", 16), fill="black")
         quantityscale = ttk.Scale(self.strictboxwidget(row=13, column=7, columnspan=5), orient='horizontal', length = 100, from_=20, to=75, command=lambda q:self.updateequilibrium(q, diagram))
         quantityscale.place(relx=0, rely=0, relwidth=1, relheight=1)
-        pricescale = ttk.Scale(self.strictboxwidget(row=6, column=5, rowspan=5), orient='vertical', length = 100, from_=20, to=80)
-        pricescale.place(relx=0, rely=0, relwidth=1, relheight=1)
         
 
         ttk.Label(self.strictboxwidget(row=6, column=12, columnspan=1), text="D", style="Diagram.TLabel", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
 
     def updateequilibrium(self, q, diagram):
         q=int(round(float(q)))
-        #coords = [q/10, 0.8, q/10, q/10, 0.1, q/10]   coords list in the schema [upToDx1, UptoDy1, Equilibiumx1, Equilibiumy1, RighttoDx1, RightdoDy1]
         diagram.delete(self.UptoD, self.RighttoD)
-        diagram.update_idletasks()
         self.UptoD = self.line_coords(q/100, 0.9, q/100, (1-(q/100)), diagram)
         self.RighttoD = self.line_coords(0.1, (1-(q/100)), (q/100), (1-(q/100)), diagram)
-        diagram.update()
+        self.currentquantity.config(text=f"quantity = {q}")
+        self.currentprice.config(text=f"price = {(100-q)}")
+
 
 
 
@@ -131,8 +135,45 @@ class SPage(BasePage):
     def __init__(self, window, main):
         super().__init__(window, main)
 
-        ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Supply curve generator", style="Title.TLabel", anchor="center").place(relx=0, rely=0, relwidth=1, relheight=1)
-        ttk.Button(self.strictboxwidget(row=4, columnspan=2), text="HomePage", command=lambda: main.showpage(HomePage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
+        ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Supply curve generator", style="Title.TLabel", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+        ttk.Button(self.strictboxwidget(row=4, column=1, columnspan=2), text="HomePage", command=lambda: main.showpage(HomePage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
+
+        ttk.Label(self.strictboxwidget(row=13, column=12, columnspan=6), text="Quantity", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.currentquantity = ttk.Label(self.strictboxwidget(row=10, column=3, columnspan=2), text="Quantity is 20", anchor="center" )
+        self.currentquantity.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+        ttk.Label(self.strictboxwidget(row=5, column=4, columnspan=2), text="Price", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.currentprice = ttk.Label(self.strictboxwidget(row=10, column=1, columnspan=2), text="Price per unit is 20", anchor="center" )
+        self.currentprice.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+        #diagram area:
+        diagram = tk.Canvas(self.strictboxwidget(row=5, column=6, columnspan=8, rowspan=8), width=100, height=100, background='gray75')
+        diagram.place(relx=0, rely=0, relwidth=1, relheight=1)
+        diagram.update()
+        self.line_coords(0.1, 0.9, 0.9, 0.9, diagram)
+        self.line_coords(0.1, 0.9, 0.1, 0.1, diagram)
+        S = self.line_coords(0.2, 0.2, 0.8, 0.8, diagram)
+        self.UptoS = self.line_coords(0.2, 0.9, 0.2, 0.2, diagram)
+        self.RighttoS = self.line_coords(0.1, 0.2, 0.2, 0.2, diagram)
+        
+        
+        #diagram.create_text(self.text_coords(0.5, 0.5, diagram), text="D", font=("helvetica", 16), fill="black")
+        quantityscale = ttk.Scale(self.strictboxwidget(row=13, column=7, columnspan=5), orient='horizontal', length = 100, from_=20, to=75, command=lambda q:self.updateequilibrium(q, diagram))
+        quantityscale.place(relx=0, rely=0, relwidth=1, relheight=1)
+        
+
+        ttk.Label(self.strictboxwidget(row=10, column=12, columnspan=1), text="S", style="Diagram.TLabel", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
+
+    def updateequilibrium(self, q, diagram):
+        q=int(round(float(q)))
+        diagram.delete(self.UptoS, self.RighttoS)
+        self.UptoS = self.line_coords(q/100, 0.9, q/100, (q/100), diagram)
+        self.RighttoS = self.line_coords(0.1, (q/100), (q/100), (q/100), diagram)
+        self.currentquantity.config(text=f"quantity = {q}")
+        self.currentprice.config(text=f"price per unit = {q}")
+
+
+
 
     title = "Supply curve generator"
 
