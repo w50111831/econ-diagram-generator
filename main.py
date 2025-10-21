@@ -82,6 +82,7 @@ class HomePage(BasePage):
         ttk.Label(self.strictboxwidget(row=1, column=4, columnspan=6), text="Homepage", style="Title.TLabel", anchor="center" ).place(relx=0, rely=0, relwidth=1, relheight=1)
         ttk.Button(self.strictboxwidget(column=2, row=4, columnspan=2 ), text="Demand curve", command=lambda: main.showpage(DPage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
         ttk.Button(self.strictboxwidget(column=2, row=6, columnspan=2 ), text="Supply curve", command=lambda: main.showpage(SPage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
+        ttk.Button(self.strictboxwidget(column=2, row=8, columnspan=2), text="D + S curve", command=lambda: main.showpage(DSPage(window, main))).place(relx=0, rely=0, relwidth=1, relheight=1)
 
     title = "Homepage"
 
@@ -173,11 +174,13 @@ class SPage(BasePage):
         self.currentprice.config(text=f"price per unit = {q}")
 
 
+class DSPage(BasePage):
+    def __init__(self, window, main):
+        super().__init__(window, main)
 
+        ttk.Label(text="DS curve generator", style="Title.TLabel").grid(column=5, row=2)
 
     title = "Supply curve generator"
 
 
 main = Main() #instantiate main object
-
-        
