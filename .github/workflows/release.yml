@@ -1,0 +1,47 @@
+name: Manual Python EXE Release
+
+# Trigger manually
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      - name: Build Python EXE
+        uses: kentsx/Python2Exe@v1.1.1
+        with:
+          main: main                  
+          dist: ./dist
+          python_version: 3.9
+          pyinstaller_version: 6.7
+          exe_name: main
+          use-dependencies: false      
+          no-console: true
+          artifact: true               
+          token: ${{ secrets.GH_PAT }} 
+
+      - name: Upload EXE as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagramgenerator
+          path: ./dist/main.exe
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          token: ${{ secrets.GH_PAT }}
+          tag: release-${{ github.run_id }}   
+          name: Release ${{ github.run_id }}
+          artifacts: ./dist/main.exe
+          draft: false
+          prerelease: false
