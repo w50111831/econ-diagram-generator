@@ -21,8 +21,8 @@ jobs:
         dist: ./dist
         python_version: 3.9
         pyinstaller_version: 6.7
-        exe_name: main
-        use-dependencies: true
+        exe_name: diagramgenerator
+        use-dependencies: false
         no-console: true
         artifact: true
         # icon not provided
