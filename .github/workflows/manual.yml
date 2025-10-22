@@ -1,0 +1,30 @@
+name: Python Executable Builder
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Build Python EXE
+      uses: kentsx/Python2Exe@v1.1.1
+      with:
+        main: main
+        dist: ./dist
+        python_version: 3.9
+        pyinstaller_version: 6.7
+        exe_name: main
+        use-dependencies: true
+        no-console: true
+        artifact: true
+        # icon not provided
+        # release will use default (true)
+        token: ${{ github.token }}
