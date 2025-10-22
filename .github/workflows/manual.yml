@@ -24,6 +24,7 @@ jobs:
         exe_name: diagramgenerator
         use-dependencies: false
         no-console: true
+        release: false
         artifact: true
         # icon not provided
         # release will use default (true)
