@@ -27,4 +27,4 @@ jobs:
         artifact: true
         # icon not provided
         # release will use default (true)
-        token: ${{ github.token }}
+        token: ${{ secrets.GH_PAT }}
